@@ -1,0 +1,70 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secretpwd
+      POSTGRES_DB: prefect
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: always
+
+  server:
+    image: prefecthq/prefect:2.19.7-python3.11
+    restart: always
+    volumes:
+      - prefect:/root/.prefect
+    entrypoint: [ "/opt/prefect/entrypoint.sh", "prefect", "server", "start" ]
+    environment:
+      - PREFECT_API_URL=http://127.0.0.1:8080/api
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_SERVER_API_PORT=8080
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:secretpwd@postgres:5432/prefect
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  worker:
+    image: prefecthq/prefect:2.19.7-python3.11
+    restart: always
+    entrypoint: [ "/opt/prefect/entrypoint.sh", "prefect", "worker", "start", "-n", "docker-worker", "-p", "docker-container-workers-pool" ]
+    environment:
+      - PREFECT_API_URL=http://server:8080/api
+    depends_on:
+      - server
+
+  run-deployment-scripts:
+    image: prefecthq/prefect:2.19.7-python3.11
+    environment:
+      - PREFECT_API_URL=http://server:8080/api
+    depends_on:
+      - server
+      - postgres
+    volumes:
+      - ./deployments:/usr/src/app/deployments
+    working_dir: /usr/src/app
+    command: >
+      /bin/bash -c "python --version;
+      echo \"Prefect version $(prefect --version)\";
+      pip install prefect-github;
+      prefect work-pool create --type process docker-container-workers-pool;
+      python deployments/deploy_all_from_git.py;
+      echo 'All commands executed!'"
+
+volumes:
+  postgres-db-volume:
+  prefect:
+
+networks:
+  default:
+    name: prefect-network
