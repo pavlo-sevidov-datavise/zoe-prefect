@@ -13,7 +13,7 @@ def run_shell_task(command: str):
 
 
 @flow(name="Run shell command and capture output", log_prints=True)
-async def run_shell_flow(command: str = DEFAULT_COMMAND):
+def run_shell_flow(command: str = DEFAULT_COMMAND):
     run_shell_task(command)
 
 
