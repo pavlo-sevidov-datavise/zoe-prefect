@@ -6,7 +6,11 @@ from utils.shell_utils import ShellTask
 
 @task(name="Create text file via cmd.exe")
 def create_text_file_if_not_exists(file_path: str):
-    """Task to create a new text file only if it does not already exist."""
+    """
+    Task to create a new text file only if it does not already exist.
+    This task can only successfully finish on Windows machine.
+    It will always fail on Unix-based machine.
+    """
     if not os.path.exists(file_path):
         command = f'cmd.exe /c echo. > {file_path}'
         result = ShellTask(command=command).run()

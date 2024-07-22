@@ -41,7 +41,7 @@ def check_filenames(filenames):
 
 
 @flow(name="Verify correctness of filenames", log_prints=True)
-async def verify_filenames_flow(folder_path: str = "content_files"):
+def verify_filenames_flow(folder_path: str = "content_files"):
     """
     Flow to verify filenames in a specified folder and fail if any are invalid.
     """

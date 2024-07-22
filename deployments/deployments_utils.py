@@ -1,11 +1,8 @@
-from datetime import timedelta
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, Optional
 
 from prefect import flow
-from prefect.client.schemas.schedules import IntervalSchedule
+from prefect.client.schemas.schedules import SCHEDULE_TYPES
 from prefect.runner.storage import GitRepository, GitCredentials, Block
-
-EVERY_5_MINUTES_SCHEDULE = IntervalSchedule(interval=timedelta(minutes=5), timezone="UTC")
 
 
 class Deploy:
@@ -18,6 +15,7 @@ class Deploy:
             work_pool_name: str = "default-pool",
             branch: str = 'main',
             credentials: Union[GitCredentials, Block, Dict[str, Any], None] = None,
+            schedule: Optional[SCHEDULE_TYPES] = None,
     ):
         flow.from_source(
             source=GitRepository(
@@ -29,6 +27,6 @@ class Deploy:
         ).deploy(
             name=deployment_name,
             work_pool_name=work_pool_name,
-            schedule=EVERY_5_MINUTES_SCHEDULE,
+            schedule=schedule,
             build=False
         )

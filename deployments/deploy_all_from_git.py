@@ -1,8 +1,13 @@
+from datetime import timedelta
+
+from prefect.client.schemas.schedules import IntervalSchedule
+from prefect_github import GitHubCredentials
+
 from deployments_utils import Deploy
 
 deployments_data = [
     {
-        "name": "Run multiple flows in parallel",
+        "name": "Run multiple flows",
         "entrypoint": "flows/run_multiple_flows.py:run_multiple_flows"
     },
     {
@@ -15,6 +20,8 @@ deployments_data = [
     },
 ]
 
+EVERY_5_MINUTES_SCHEDULE = IntervalSchedule(interval=timedelta(minutes=5), timezone="UTC")
+
 if __name__ == "__main__":
     for data in deployments_data:
         Deploy(
@@ -22,4 +29,6 @@ if __name__ == "__main__":
             git_url="https://github.com/pavlo-sevidov-datavise/zoe-prefect.git",
             entrypoint=data["entrypoint"],
             work_pool_name="docker-container-workers-pool",
+            credentials=GitHubCredentials.load("github-access-token"),
+            schedule=EVERY_5_MINUTES_SCHEDULE
         )

@@ -1,14 +1,9 @@
-from prefect import flow, task
+from prefect import flow
 
 
-@task
-def print_hellp_task():
-    print("Hello world from Prefect!")
-
-
-@flow(name="Print hello from Prefect", log_prints=True)
-async def simple_print_flow():
-    print_hellp_task()
+@flow(log_prints=True)
+def simple_print_flow():
+    print("Hello, World!")
 
 
 if __name__ == "__main__":
