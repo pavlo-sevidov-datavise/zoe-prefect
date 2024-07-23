@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from prefect.client.schemas.schedules import IntervalSchedule
-from prefect_github import GitHubCredentials
 
 from deployments_utils import Deploy
 
@@ -29,6 +28,5 @@ if __name__ == "__main__":
             git_url="https://github.com/pavlo-sevidov-datavise/zoe-prefect.git",
             entrypoint=data["entrypoint"],
             work_pool_name="docker-container-workers-pool",
-            credentials=GitHubCredentials.load("github-access-token"),
             schedule=EVERY_5_MINUTES_SCHEDULE
         )
