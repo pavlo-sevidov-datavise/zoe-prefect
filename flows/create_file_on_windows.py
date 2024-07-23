@@ -1,7 +1,7 @@
 from prefect import flow, task
 import os
 
-from utils.shell_utils import ShellTask
+from utilities.shell_utils import ShellTask
 
 
 @task(name="Create text file via cmd.exe")

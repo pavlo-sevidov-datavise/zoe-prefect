@@ -1,6 +1,6 @@
 from prefect import flow, task
 
-from utils.shell_utils import ShellTask
+from utilities.shell_utils import ShellTask
 
 DEFAULT_COMMAND = "seq 1 100 | xargs -I{} sh -c 'date; sleep 3'"
 

@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:13
@@ -37,11 +35,16 @@ services:
   worker:
     image: prefecthq/prefect:2.19.7-python3.11
     restart: always
-    entrypoint: [ "/opt/prefect/entrypoint.sh", "prefect", "worker", "start", "-n", "docker-worker", "-p", "docker-container-workers-pool" ]
     environment:
       - PREFECT_API_URL=http://server:8080/api
     depends_on:
       - server
+    volumes:
+      - ./requirements.txt:/usr/src/app/requirements.txt
+    working_dir: /usr/src/app
+    command: >
+      /bin/bash -c "pip install -r requirements.txt;
+      /opt/prefect/entrypoint.sh prefect worker start -n docker-worker -p docker-container-workers-pool"
 
   run-deployment-scripts:
     image: prefecthq/prefect:2.19.7-python3.11
@@ -52,12 +55,14 @@ services:
       - postgres
     volumes:
       - ./deployments:/usr/src/app/deployments
+      - ./requirements.txt:/usr/src/app/requirements.txt
     working_dir: /usr/src/app
     command: >
       /bin/bash -c "python --version;
       echo \"Prefect version $(prefect --version)\";
       pip install prefect-github;
       prefect work-pool create --type process docker-container-workers-pool;
+      pip install -r requirements.txt;
       python deployments/deploy_all_from_git.py;
       echo 'All commands executed!'"
 
