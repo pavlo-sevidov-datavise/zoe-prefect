@@ -83,12 +83,11 @@ Feel free to discover other examples of tasks under **flows** folder.
     - [run_multiple_flows.py](flows/run_multiple_flows.py): Flow to run multiple flows.
     - [run_shell_command.py](flows/run_shell_command.py): Parametrized flow to run shell commands and capture stdout logs.
     - [simple_print_flow.py](flows/simple_print_flow.py): Simple flow to print 'Hello, World' a message.
-    - **utils/**: Utility functions for the flows.
-        - [shell_utils.py](flows/utils/shell_utils.py): Utility wrapper for easily using of ShellTask and capture logs.
 - [**docker-compose.yaml**](docker-compose.yaml): Docker Compose configuration file for easy installation and running locally.
 - [**.prefectignore**](.prefectignore): Prefect ignore file.
 - [**.gitignore**](.gitignore): Git ignore file.
 - [**readme.md**](readme.md): Project documentation file.
+- [**requirements.txt**](requirements.txt): Python project requirements
 
 ## How to run this demo locally using Docker
 1) Clone the Git repository locally on your machine:
@@ -157,8 +156,12 @@ This means that one can run python scripts locally for verification just by runn
 Let's take a look how to check logs for [run_shell_command.py](flows/run_shell_command.py) flow which runs long running shell command by default and capture stdout logs in real-time.
 
 This flow demonstrates example of long running process (or a game) that needs to be run with certain parameters and how it captures stdout logs in real-time.
-Under the hoot it executes command that prints current date 100 times with 3 seconds delay. In other words it will be running for 5 minutes.
-Default shell command
+
+Under the hood it uses custom created python library that has utility wrapper for easily using of ShellTask and capture logs. This library defined in the https://github.com/pavlo-sevidov-datavise/zoe-utils. It automatically publishes this library to the PyPI repository https://pypi.org/project/zoe-utils/.
+
+This flow executes shell command that prints current date 100 times with 3 seconds delay. So it will be running for 5 minutes.
+
+Shell command used to run it for 5 minutes:
 ```shell
 seq 1 100 | xargs -I{} sh -c 'date; sleep 3'
 ```
